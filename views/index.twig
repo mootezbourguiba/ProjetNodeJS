@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ title }}</title>
+  <script src="/socket.io/socket.io.js"></script>
+  <link rel="stylesheet" href="/styles.css">
+
+</head>
+<body>
+  <div>
+    <h1>{{ title }}</h1>
+    <input type="text" id="username" placeholder="Nom d'utilisateur">
+    <input type="text" id="group" placeholder="Groupe">
+    <button id="joinGroup">Rejoindre le Groupe</button>
+  </div>
+  <div>
+    <h2>Messages</h2>
+    <ul id="messages"></ul>
+    <input type="text" id="message" placeholder="Message">
+    <button id="sendMessage">Envoyer</button>
+  </div>
+  <script>
+    const socket = io();
+
+    document.getElementById('joinGroup').onclick = () => {
+      const groupId = document.getElementById('group').value;
+      socket.emit('joinGroup', groupId);
+    };
+
+    document.getElementById('sendMessage').onclick = () => {
+      const content = document.getElementById('message').value;
+      const userId = 1; // Remplacer par l'ID de l'utilisateur connecté
+      const groupId = document.getElementById('group').value;
+      socket.emit('newMessage', { content, userId, groupId });
+    };
+
+    socket.on('message', (message) => {
+      const li = document.createElement('li');
+      li.textContent = `${message.content} (Utilisateur ${message.userId}, Groupe ${message.groupId})`;
+      document.getElementById('messages').appendChild(li);
+    });
+  </script>
+</body>
+</html>
